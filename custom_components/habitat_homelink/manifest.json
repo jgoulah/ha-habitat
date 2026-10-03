@@ -1,0 +1,17 @@
+{
+  "domain": "habitat_homelink",
+  "name": "Habitat HomeLink",
+  "codeowners": ["@jgoulah"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jgoulah/ha-habitat",
+  "integration_type": "hub",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/jgoulah/ha-habitat/issues",
+  "requirements": [
+    "pycognito==2024.5.1",
+    "boto3",
+    "paho-mqtt>=2.0.0"
+  ],
+  "version": "0.1.0"
+}

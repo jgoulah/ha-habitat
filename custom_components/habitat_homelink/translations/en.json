@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Habitat HomeLink",
+        "description": "Enter the email and password you use in the Habitat HomeLink app.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Habitat HomeLink",
+        "description": "Habitat rejected the password of {email}. Enter the current password.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email or password",
+      "cannot_connect": "Cannot connect to the Habitat cloud",
+      "no_devices": "No HomeLink gateway found on this account",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "Account is already configured",
+      "reauth_successful": "Password updated"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "filter_run_days": {
+        "name": "Filter run days"
+      }
+    }
+  }
+}
