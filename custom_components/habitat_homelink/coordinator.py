@@ -79,6 +79,8 @@ class HabitatCoordinator(DataUpdateCoordinator[dict[str, HabitatDevice]]):
         self._connection: HabitatMqttConnection | None = None
         self._cancel_confirmation: CALLBACK_TYPE | None = None
         self.push_available = False
+        # Gateway thing name -> device registry id of the gateway device
+        self.gateway_device_ids: dict[str, str] = {}
 
     @property
     def gateways(self) -> list[str]:

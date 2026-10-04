@@ -22,7 +22,7 @@ with your HomeLink app email and password.
 ## Development
 
 ```sh
-uv venv -p 3.13 .venv
+uv venv -p 3.14 .venv
 uv pip install -p .venv/bin/python pytest-homeassistant-custom-component pycognito==2024.5.1 boto3 "paho-mqtt>=2.0.0"
 .venv/bin/python -m pytest
 ```

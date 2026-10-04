@@ -26,8 +26,10 @@ class HabitatEntity(CoordinatorEntity[HabitatCoordinator]):
             name="Habitat PTAC",
             manufacturer="Habitat / Ice Air",
             model=device.thing.model,
-            via_device=(DOMAIN, device.thing.gateway),
         )
+        # via_device (identifier tuple) is deprecated; link to the gateway by its device registry id
+        if via_device_id := coordinator.gateway_device_ids.get(device.thing.gateway):
+            self._attr_device_info["via_device_id"] = via_device_id
 
     @property
     def device(self) -> HabitatDevice | None:

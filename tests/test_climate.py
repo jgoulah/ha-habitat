@@ -18,6 +18,7 @@ from homeassistant.components.climate import (
 )
 from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -25,7 +26,7 @@ from custom_components.habitat_homelink.climate import celsius_x100_to_fahrenhei
 from custom_components.habitat_homelink.const import DOMAIN
 from custom_components.habitat_homelink.coordinator import HabitatCoordinator
 
-from .fixtures import INDEX, THERMOSTAT, FakeApi, FakeConnection
+from .fixtures import GATEWAY, INDEX, THERMOSTAT, FakeApi, FakeConnection
 
 ENTITY_ID = "climate.habitat_ptac"
 
@@ -121,3 +122,30 @@ async def test_refresh_requested_on_connect(hass: HomeAssistant, connection: Fak
     connection.kwargs["on_connected"]()
     await hass.async_block_till_done()
     assert connection.published == [(THERMOSTAT, INDEX, {"ep0:sPTAC868:SetRefresh": "040000"})]
+
+
+def _device(hass: HomeAssistant, thing: str) -> dr.DeviceEntry:
+    entry = hass.config_entries.async_entries(DOMAIN)[0]
+    devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+    return next(device for device in devices if (DOMAIN, thing) in device.identifiers)
+
+
+async def test_device_linked_to_gateway(hass: HomeAssistant, connection: FakeConnection) -> None:
+    gateway, thermostat = _device(hass, GATEWAY), _device(hass, THERMOSTAT)
+    assert thermostat.via_device_id == gateway.id
+
+
+async def test_device_rename_readds_entities(hass: HomeAssistant, connection: FakeConnection) -> None:
+    """Renaming the device re-adds its entities, which failed with the deprecated via_device."""
+    dr.async_get(hass).async_update_device(_device(hass, THERMOSTAT).id, name_by_user="Habitat PTAC LR")
+    entry = hass.config_entries.async_entries(DOMAIN)[0]
+    with (
+        patch("custom_components.habitat_homelink.HabitatApi", FakeApi),
+        patch(
+            "custom_components.habitat_homelink.HabitatCoordinator",
+            functools.partial(HabitatCoordinator, connection_factory=FakeConnection),
+        ),
+    ):
+        assert await hass.config_entries.async_reload(entry.entry_id)
+        await hass.async_block_till_done()
+    assert hass.states.get(ENTITY_ID).state == HVACMode.COOL

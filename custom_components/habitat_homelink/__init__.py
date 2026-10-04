@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HabitatConfigEntry) -> b
     # Gateways are registered first so devices can refer to them
     device_registry = dr.async_get(hass)
     for gateway in coordinator.gateways:
-        device_registry.async_get_or_create(
+        device = device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers={(DOMAIN, gateway)},
             manufacturer="Habitat / Ice Air",
@@ -42,6 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HabitatConfigEntry) -> b
             name="Habitat HomeLink",
             serial_number=gateway.split("-", 1)[-1],
         )
+        coordinator.gateway_device_ids[gateway] = device.id
 
     await coordinator.async_start_connection()
     entry.runtime_data = coordinator
