@@ -113,6 +113,7 @@ class HabitatCoordinator(DataUpdateCoordinator[dict[str, HabitatDevice]]):
             if isinstance(result, BaseException):
                 errors.append(result)
             elif (reported := extract_reported(result)) is not None:
+                _LOGGER.debug("Polled state of %s: %s", thing.name, reported[1])
                 self._store.update_reported(thing.name, reported[0], reported[1], now)
         if errors:
             if not any(self._store.is_fresh(thing.name, now) for thing in self._device_things()):
@@ -172,6 +173,7 @@ class HabitatCoordinator(DataUpdateCoordinator[dict[str, HabitatDevice]]):
             return
         if thing not in {device.name for device in self._device_things()}:
             return
+        _LOGGER.debug("Pushed state of %s: %s", thing, reported[1])
         now = self._clock()
         self._store.update_reported(thing, reported[0], reported[1], now)
         self.async_set_updated_data(self._build_data(now))
